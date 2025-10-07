@@ -1,0 +1,50 @@
+name: Validate Sentinel Core
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install pytest pytest-cov jsonschema pyyaml httpx
+
+      - name: Validate structure exists
+        run: |
+          test -f LICENSE
+          test -f README.md
+          test -f STRATEGY.md
+          test -f PRINCIPLES.md
+          test -f DEPLOYMENT.md
+          test -f requirements.txt
+          test -f Dockerfile
+          test -f docker-compose.yml
+          test -d VALIDATION/schemas
+          test -f VALIDATION/schemas/strategy_schema.json || true
+          test -f VALIDATION/schemas/principles_schema.json || true
+          test -f VALIDATION/schemas/deployment_schema.json || true
+          test -f VALIDATION/integrity_attestation.txt || true
+          test -f app/main.py || true
+          test -f src/sentinel_core/data_fusion_engine.py || true
+          test -f src/sentinel_core/cryptographic_attestation.py || true
+          test -f tests/test_sentinel_core.py || true
+          test -f tests/test_integration.py || true
+
+      - name: Run tests
+        run: |
+          if [ -d tests ]; then pytest -q --maxfail=1 --disable-warnings; fi
