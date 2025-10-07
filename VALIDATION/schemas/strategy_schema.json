@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Strategy Schema",
+  "type": "object",
+  "properties": {
+    "objectives": {"type": "array", "items": {"type": "string"}},
+    "metrics": {"type": "object"}
+  },
+  "required": ["objectives", "metrics"]
+}
